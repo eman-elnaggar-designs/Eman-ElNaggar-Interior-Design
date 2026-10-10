@@ -89,6 +89,15 @@
       <rect x="5" y="11" width="14" height="9.5" rx="1.5" />
       <path d="M8 11V7.5a4 4 0 0 1 8 0V11M12 15v2.5" />
     </symbol>
+        <symbol id="i-eye" viewBox="0 0 24 24">
+      <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+      <circle cx="12" cy="12" r="2.8" />
+    </symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24">
+      <path d="M4 4l16 16" />
+      <path d="M10 5.8A9.6 9.6 0 0 1 12 5.5c6 0 9.5 6.5 9.5 6.5a17.3 17.3 0 0 1-3.4 4M6.6 8.2A16.6 16.6 0 0 0 2.5 12S6 18.5 12 18.5c1.2 0 2.3-.2 3.3-.6" />
+      <path d="M9.9 9.9a2.8 2.8 0 0 0 4 4" />
+    </symbol>
   </svg>
 
   <!-- Login gate (Supabase Authentication) -->
@@ -111,8 +120,7 @@
           <use href="#i-arrow" />
         </svg></button>
       <p class="gate-err" id="gateErr">Incorrect email or password — please try again.</p>
-      <p class="gate-hint">The administrator account is created in your <b>Supabase dashboard</b>. Public sign-up is
-        disabled, so this is the only key to the studio.</p>
+      
     </form>
   </div>
 
@@ -217,17 +225,22 @@
           </form>
         </section>
 
-        <!-- List -->
-        <section class="panel">
-          <h2><span>All Projects</span></h2>
-          <div id="projList"></div>
-        </section>
-      </div>
+                <!-- Lists -->
+        <div class="list-col">
+          <section class="panel">
+            <h2><span>All Projects</span></h2>
+            <div id="projList"></div>
+          </section>
 
-      <p class="admin-note">Projects and photos are stored in <b>Supabase</b> (database + storage), so every change
-        syncs automatically to every device — no redeploy needed. Use <b>Export</b> occasionally for a metadata backup;
-        the image files themselves live in Supabase Storage. Uncheck <b>Published</b> to keep a project as a draft that
-        only you can see.</p>
+          <section class="panel hidden-panel">
+            <h2><span>Hidden Projects</span><span class="count-badge" id="hiddenCount"></span></h2>
+            <p class="field-hint">Hidden projects stay saved in the database with all their photos and details, but are
+              not shown on the public website. Restore them any time — or delete them permanently with the bin button.</p>
+            <div id="hiddenList"></div>
+          </section>
+        </div>
+
+    
     </main>
   </div>
 

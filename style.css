@@ -369,3 +369,16 @@ svg.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;str
 .modal-box h3{font:500 1.5rem var(--serif)}
 .modal-box p{color:var(--body);margin:.6rem 0 1.5rem;font-size:.92rem}
 .modal-actions{display:flex;gap:.8rem;justify-content:flex-end}
+/* =========================================================
+   PDF download (public) & Hidden Projects (admin)
+   ========================================================= */
+.pdf-cta{margin-top:1.8rem}
+.btn[disabled]{opacity:.55;pointer-events:none}
+
+.list-col{display:grid;gap:2rem;align-content:start;min-width:0}
+.count-badge{font:500 .56rem var(--sans);letter-spacing:.22em;color:var(--body);border:1px solid var(--line-soft);padding:.22rem .5rem;margin-left:.7rem;vertical-align:middle}
+.hidden-panel .field-hint{margin:1rem 0 .4rem}
+.hidden-panel .list-row{opacity:.9}
+.empty--sm{padding:1.4rem .2rem;text-align:left}
+.empty--sm em{font-size:1.05rem}
+.empty--sm p{font-size:.8rem}

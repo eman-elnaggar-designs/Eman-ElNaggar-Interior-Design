@@ -42,15 +42,15 @@ function initSupabase() {
 
 function publicUrl(path) {
   return `${SUPABASE_URL}/storage/v1/object/public/${SUPABASE_BUCKET}/` +
-         String(path).split('/').map(encodeURIComponent).join('/');
+    String(path).split('/').map(encodeURIComponent).join('/');
 }
 
 /* =========================================================
    1) Shared helpers
    ========================================================= */
-const $  = (s, c = document) => c.querySelector(s);
+const $ = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => [...c.querySelectorAll(s)];
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const pad = n => String(n).padStart(2, '0');
 
 function uuid() {
@@ -75,8 +75,8 @@ function imgErr(img) { img.onerror = null; img.src = FALLBACK_IMG; }
 
 function lockUpdate() {
   const any = $('#detail')?.classList.contains('open') ||
-              $('#lightbox')?.classList.contains('open') ||
-              $('#menu')?.classList.contains('open') || false;
+    $('#lightbox')?.classList.contains('open') ||
+    $('#menu')?.classList.contains('open') || false;
   document.body.classList.toggle('locked', any);
 }
 
@@ -244,7 +244,7 @@ function uploadWithProgress(file, path, onProgress) {
       xhr.onload = () => {
         if (xhr.status >= 200 && xhr.status < 300) { resolve(); return; }
         let msg = `Upload failed (${xhr.status})`;
-        try { const j = JSON.parse(xhr.responseText); if (j.message) msg = j.message; } catch (_) {}
+        try { const j = JSON.parse(xhr.responseText); if (j.message) msg = j.message; } catch (_) { }
         reject(new Error(msg));
       };
       xhr.onerror = () => reject(new Error('Network error while uploading — please try again.'));
@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initModal();
   sb = initSupabase();
   if (document.body.dataset.page === 'public') initPublic();
-  if (document.body.dataset.page === 'admin')  initAdmin();
+  if (document.body.dataset.page === 'admin') initAdmin();
 });
 
 /* =========================================================
@@ -427,7 +427,7 @@ function initPublic() {
     const it = lb.items[lb.i] || {};
     lbImg.classList.add('fade');
     const tmp = new Image();
-    tmp.onload  = () => { lbImg.src = tmp.src; lbImg.classList.remove('fade'); };
+    tmp.onload = () => { lbImg.src = tmp.src; lbImg.classList.remove('fade'); };
     tmp.onerror = () => { lbImg.src = FALLBACK_IMG; lbImg.classList.remove('fade'); };
     tmp.src = it.url || FALLBACK_IMG;
     lbImg.alt = it.label || 'Project image';
@@ -474,14 +474,307 @@ function initPublic() {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState !== 'visible' || !sb) return;
     if ($('#detail').classList.contains('open') || $('#lightbox').classList.contains('open')) return;
-    loadProjects().catch(() => {});
+    loadProjects().catch(() => { });
+  });
+  /* Download portfolio PDF */
+  $('#btnPdf').addEventListener('click', async () => {
+    const btn = $('#btnPdf');
+    if (btn.disabled) return;
+    btn.disabled = true;
+    const original = btn.innerHTML;
+    btn.textContent = 'Preparing PDF…';
+    try {
+      await loadPdfLib();
+      toast('Building your PDF — large galleries may take a moment');
+      const list = await fetchProjectRows(false); // published projects only
+      if (!list.length) { toast('There are no published projects to include yet.'); return; }
+      const doc = await buildPortfolioPdf(list);
+      doc.save('Eman-El-Naggar-Portfolio.pdf');
+      toast('Portfolio PDF downloaded');
+    } catch (err) {
+      console.error(err);
+      toast(err?.message || 'Could not generate the PDF — please try again.');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = original;
+    }
   });
 
   loadProjects();
   observeReveals();
   $('#year').textContent = new Date().getFullYear();
 }
+/* =========================================================
+   PDF EXPORT (public site)
+   Built in the browser with jsPDF — no server, no print dialog.
+   The library is lazy-loaded on first click so regular visitors
+   don't download it with the page.
+   ========================================================= */
+const PDF_LIB_URL = 'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js';
+let pdfLibPromise = null;
 
+function loadPdfLib() {
+  if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve();
+  if (!pdfLibPromise) {
+    pdfLibPromise = new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = PDF_LIB_URL;
+      s.onload = () => resolve();
+      s.onerror = () => { pdfLibPromise = null; reject(new Error('Could not load the PDF library — check your internet connection and try again.')); };
+      document.head.appendChild(s);
+    });
+  }
+  return pdfLibPromise;
+}
+
+/* Load one image into a canvas. This normalises every supported format
+   (JPG / PNG / WebP) to JPEG for the PDF and preserves aspect ratio.
+   Resolves null on any failure (CORS, 404, timeout) so the PDF can
+   continue with an elegant placeholder instead of failing entirely. */
+function pdfImage(url) {
+  return new Promise(resolve => {
+    let settled = false;
+    const done = v => { if (!settled) { settled = true; clearTimeout(t); resolve(v); } };
+    const t = setTimeout(() => done(null), 15000);
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const MAX = 1600; // cap resolution to keep the file size reasonable
+        const w = img.naturalWidth || 1, h = img.naturalHeight || 1;
+        const sc = Math.min(1, MAX / Math.max(w, h));
+        const c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(w * sc));
+        c.height = Math.max(1, Math.round(h * sc));
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, c.width, c.height); // flatten any transparency
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        const dataUrl = c.toDataURL('image/jpeg', 0.85); // throws if the canvas is CORS-tainted
+        done({ dataUrl, w, h });
+      } catch (e) { done(null); }
+    };
+    img.onerror = () => done(null);
+    img.src = url;
+  });
+}
+
+async function buildPortfolioPdf(projects) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
+
+  const PW = 210, PH = 297, M = 18;             // A4 + margins
+  const CW = PW - M * 2;                        // content width
+  const FOOT = 16;                              // reserved footer zone
+  const INK = [26, 28, 26], GREEN = [14, 42, 32], GOLD = [198, 161, 91],
+    GOLDSOFT = [216, 188, 133], CREAM = [236, 231, 218],
+    GREY = [110, 108, 100], LINE = [222, 216, 202];
+  const pageTone = [];                          // remember dark/light per page for the footers
+  let y = M + 6;
+
+  const setTone = tone => { pageTone[doc.getNumberOfPages() - 1] = tone; };
+  const diamond = (x, r) => {
+    doc.setDrawColor(...GOLD); doc.setLineWidth(0.5);
+    doc.line(x - r, y, x, y - r); doc.line(x, y - r, x + r, y);
+    doc.line(x + r, y, x, y + r); doc.line(x, y + r, x - r, y);
+  };
+  const rule = (yy, w, color = GOLD) => { doc.setDrawColor(...color); doc.setLineWidth(0.4); doc.line(M, yy, M + w, yy); };
+  const eyebrow = (text, x, yy, color = GOLD, align = 'left') => {
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+    doc.setTextColor(...color); doc.setCharSpace(1.6);
+    doc.text(text.toUpperCase(), x, yy, { align });
+    doc.setCharSpace(0);
+  };
+  const ensure = h => {
+    if (y + h > PH - FOOT) { doc.addPage(); setTone('light'); y = M + 6; return true; }
+    return false;
+  };
+  const fit = (w, h, boxW, boxH) => {           // contain-fit — never stretches, never crops
+    const a = w / h;
+    let bw = boxW, bh = bw / a;
+    if (bh > boxH) { bh = boxH; bw = bh * a; }
+    return { w: bw, h: bh };
+  };
+
+  async function placeImage(img, boxW, boxMaxH) {
+    const d = img ? await pdfImage(img.url) : null;
+    if (d) {
+      const f = fit(d.w, d.h, boxW, boxMaxH);
+      ensure(f.h + 6);
+      const x = M + (boxW - f.w) / 2;
+      doc.setFillColor(248, 246, 241); doc.rect(x - 3, y - 3, f.w + 6, f.h + 6, 'F');
+      doc.addImage(d.dataUrl, 'JPEG', x, y, f.w, f.h);
+      doc.setDrawColor(...GOLD); doc.setLineWidth(0.5); doc.rect(x - 1.2, y - 1.2, f.w + 2.4, f.h + 2.4);
+      y += f.h + 9;
+    } else {
+      const ph = Math.min(70, boxMaxH);
+      ensure(ph + 6);
+      doc.setFillColor(244, 241, 234); doc.rect(M, y, boxW, ph, 'F');
+      doc.setDrawColor(...GOLD); doc.setLineWidth(0.5); doc.rect(M, y, boxW, ph);
+      doc.setFont('times', 'italic'); doc.setFontSize(12); doc.setTextColor(...GREY);
+      doc.text('Photography coming soon', M + boxW / 2, y + ph / 2 + 1.5, { align: 'center' });
+      y += ph + 9;
+    }
+  }
+
+  /* ---------- Cover page (dark, mirrors the website's identity) ---------- */
+  setTone('dark');
+  doc.setFillColor(12, 14, 12); doc.rect(0, 0, PW, PH, 'F');
+  doc.setDrawColor(...GOLD); doc.setLineWidth(0.6); doc.rect(11, 11, PW - 22, PH - 22);
+  doc.setDrawColor(90, 78, 50); doc.setLineWidth(0.3); doc.rect(15, 15, PW - 30, PH - 30);
+
+  eyebrow('Interior Design · Egypt', PW / 2, 40, GOLDSOFT, 'center');
+  doc.setFont('times', 'normal'); doc.setFontSize(44); doc.setTextColor(...CREAM);
+  doc.text('Eman', PW / 2, 62, { align: 'center' });
+  doc.setFont('times', 'italic');
+  doc.text('El-Naggar', PW / 2, 78, { align: 'center' });
+  y = 90; diamond(PW / 2, 2.6);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(...GOLDSOFT);
+  doc.setCharSpace(2.4);
+  doc.text('SELECTED WORKS — PORTFOLIO', PW / 2, 102, { align: 'center' });
+  doc.setCharSpace(0);
+
+  const first = projects[0];
+  const heroSrc = first ? (first.cover || (first.rooms[0]?.photos[0]?.url)) : null;
+  if (heroSrc) {
+    const d = await pdfImage(heroSrc);
+    if (d) {
+      const f = fit(d.w, d.h, 96, 130);
+      const x = PW / 2 - f.w / 2, hy = 118;
+      doc.setDrawColor(...GOLD); doc.setLineWidth(0.6);
+      doc.rect(x - 6, hy - 6, f.w + 12, f.h + 12);
+      doc.addImage(d.dataUrl, 'JPEG', x, hy, f.w, f.h);
+    }
+  }
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(...GREY);
+  doc.setCharSpace(1.5);
+  doc.text(String(new Date().getFullYear()), PW / 2, PH - 26, { align: 'center' });
+  doc.setCharSpace(0);
+
+  /* ---------- About page ---------- */
+  doc.addPage(); setTone('light');
+  y = M + 6;
+  eyebrow('The Designer', M, y); y += 11;
+  doc.setFont('times', 'normal'); doc.setFontSize(26); doc.setTextColor(...INK);
+  doc.text('Designing with intention', M, y);
+  y += 6; rule(y, 52); y += 10;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5); doc.setTextColor(...GREY);
+  const about1 = 'Eman El-Naggar is an Alexandria-based interior designer with a practice established in 1998 and projects extending across Egypt. Her approach is rooted in timeless elegance, thoughtful proportion and a deep understanding of how people experience space — balancing architectural character with functionality, refined materials and carefully considered details.';
+  const about2 = 'From private residences and luxury apartments to villas and bespoke interiors, every project is overseen personally, from the first concept and spatial planning through material selection, custom furnishings, styling and final execution.';
+  doc.splitTextToSize(about1, CW).forEach(l => { doc.text(l, M, y); y += 5.4; });
+  y += 2.5;
+  doc.splitTextToSize(about2, CW).forEach(l => { doc.text(l, M, y); y += 5.4; });
+  y += 8;
+  doc.setFont('times', 'italic'); doc.setFontSize(15); doc.setTextColor(...GREEN);
+  doc.text('\u2014 Eman El-Naggar', M, y); y += 13;
+
+  const services = [
+    ['01', 'Full Interior Design', 'Complete management of the design process, down to the last detail.'],
+    ['02', 'Space Planning & Layout', 'Practical, beautiful layouts for space, movement, light and furniture.'],
+    ['03', 'Custom Furniture & Joinery', 'Bespoke pieces matched to the style and character of each project.'],
+    ['04', 'Styling & Site Supervision', 'Follow-through from start to finish to the right quality and standard.']
+  ];
+  services.forEach(([num, name, desc]) => {
+    const lines = doc.splitTextToSize(desc, CW - 12);
+    ensure(16 + (lines.length - 1) * 4.4);
+    doc.setFont('times', 'italic'); doc.setFontSize(11); doc.setTextColor(...GOLD);
+    doc.text(num, M, y);
+    doc.setFont('times', 'normal'); doc.setFontSize(12.5); doc.setTextColor(...INK);
+    doc.text(name, M + 10, y);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(...GREY);
+    lines.forEach((l, i) => doc.text(l, M + 10, y + 4.8 + i * 4.4));
+    rule(y + 10.5 + (lines.length - 1) * 4.4, CW, LINE);
+    y += 17 + (lines.length - 1) * 4.4;
+  });
+
+  /* ---------- Projects ---------- */
+  for (let pi = 0; pi < projects.length; pi++) {
+    const p = projects[pi];
+    doc.addPage(); setTone('light');
+    y = M + 6;
+
+    eyebrow(`Project ${String(pi + 1).padStart(2, '0')}`, M, y);
+    y += 12;
+    doc.setFont('times', 'normal'); doc.setFontSize(27); doc.setTextColor(...INK);
+    doc.splitTextToSize(p.name || 'Untitled project', CW).forEach(l => { doc.text(l, M, y); y += 10.5; });
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(...GREY);
+    doc.setCharSpace(1.2);
+    doc.text([p.location, p.year].filter(Boolean).join('  ·  ').toUpperCase(), M, y + 2);
+    doc.setCharSpace(0);
+    y += 9; rule(y, CW); y += 8;
+
+    if (p.description) {
+      doc.setFont('times', 'normal'); doc.setFontSize(11); doc.setTextColor(...GREY);
+      doc.splitTextToSize(p.description, CW).forEach(l => { ensure(6); doc.text(l, M, y); y += 5.4; });
+      y += 5;
+    }
+
+    const coverImg = p.cover ? { url: p.cover } : (p.rooms[0]?.photos[0] || null);
+    await placeImage(coverImg, CW, 115);
+
+    for (let ri = 0; ri < p.rooms.length; ri++) {
+      const room = p.rooms[ri];
+      if (!room.photos.length) continue;
+      ensure(50); // keep the room header together with its first photo
+      y += 5;
+      doc.setFont('times', 'italic'); doc.setFontSize(14); doc.setTextColor(...GREEN);
+      doc.text(room.label || 'Untitled space', M, y);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(...GOLD);
+      doc.setCharSpace(1.4);
+      doc.text(`ROOM ${String(ri + 1).padStart(2, '0')}`, PW - M, y, { align: 'right' });
+      doc.setCharSpace(0);
+      y += 4.5; rule(y, CW); y += 7;
+      for (const photo of room.photos) await placeImage(photo, CW, 150);
+    }
+  }
+
+  /* ---------- Contact page (dark) ---------- */
+  doc.addPage(); setTone('dark');
+  doc.setFillColor(12, 14, 12); doc.rect(0, 0, PW, PH, 'F');
+  doc.setDrawColor(...GOLD); doc.setLineWidth(0.6); doc.rect(11, 11, PW - 22, PH - 22);
+  y = 48;
+  eyebrow('Contact', PW / 2, y, GOLDSOFT, 'center'); y += 15;
+  doc.setFont('times', 'normal'); doc.setFontSize(24); doc.setTextColor(...CREAM);
+  doc.text('Let\u2019s create a space', PW / 2, y, { align: 'center' }); y += 10.5;
+  doc.setFont('times', 'italic');
+  doc.text('you\u2019ll love to live in.', PW / 2, y, { align: 'center' });
+  y += 14; diamond(PW / 2, 2.4); y += 17;
+
+  const contacts = [
+    ['PHONE', '+2 0 111 546 2111'],
+    ['WHATSAPP', 'wa.me/201115462111 — message the studio'],
+    ['EMAIL', 'hello@emanelnaggar.com'],
+    ['INSTAGRAM', '@eman.elnaggar.design'],
+    ['FACEBOOK', 'Eman El-Naggar Design'],
+    ['LINKEDIN', 'Eman El-Naggar']
+  ];
+  contacts.forEach(([k, v]) => {
+    ensure(12);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(...GOLDSOFT);
+    doc.setCharSpace(1.5);
+    doc.text(k, PW / 2 - 3, y, { align: 'right' });
+    doc.setCharSpace(0);
+    doc.setFont('times', 'normal'); doc.setFontSize(12); doc.setTextColor(...CREAM);
+    doc.text(v, PW / 2 + 3, y);
+    y += 10.5;
+  });
+
+  /* ---------- Footers on every page except the cover ---------- */
+  const total = doc.getNumberOfPages();
+  for (let i = 2; i <= total; i++) {
+    doc.setPage(i);
+    const dark = pageTone[i - 1] === 'dark';
+    doc.setDrawColor(...(dark ? [90, 78, 50] : LINE));
+    doc.setLineWidth(0.3); doc.line(M, PH - 12, PW - M, PH - 12);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
+    doc.setCharSpace(1.1);
+    doc.setTextColor(...(dark ? GOLDSOFT : GREY));
+    doc.text('EMAN EL-NAGGAR — INTERIOR DESIGN', M, PH - 7);
+    doc.text(`${String(i).padStart(2, '0')} / ${String(total).padStart(2, '0')}`, PW - M, PH - 7, { align: 'right' });
+    doc.setCharSpace(0);
+  }
+  return doc;
+}
 /* =========================================================
    ADMIN DASHBOARD
    ========================================================= */
@@ -544,7 +837,9 @@ function initAdmin() {
       app.hidden = false;
       await refreshList();
     } catch (err) {
-      showGate(friendlyDbError(err));
+      const m = String(err?.message || '').toLowerCase();
+      if (m.includes('session') || m.includes('401')) showGate(); // simply not signed in — show the clean gate
+      else showGate(friendlyDbError(err));
     } finally {
       entering = false;
     }
@@ -574,7 +869,7 @@ function initAdmin() {
   });
 
   $('#logout').addEventListener('click', async () => {
-    try { await sb.auth.signOut(); } catch (_) {}
+    try { await sb.auth.signOut(); } catch (_) { }
     showGate('Signed out.');
   });
 
@@ -649,8 +944,8 @@ function initAdmin() {
     const fig = document.createElement('figure');
     fig.className = 'ph';
     const src = ph.kind === 'file' ? ph.preview
-              : ph.kind === 'url' ? ph.url
-              : (ph.url || publicUrl(ph.path));
+      : ph.kind === 'url' ? ph.url
+        : (ph.url || publicUrl(ph.path));
     fig.innerHTML = `
       <img src="${esc(src)}" alt="" onerror="imgErr(this)">
       ${ph.kind === 'file' ? '<span class="ph-badge">New</span>' : ''}
@@ -800,8 +1095,8 @@ function initAdmin() {
     $('#fPublished').checked = p.published;
     originalCoverPath = p.coverPath;
     cover = p.coverPath ? { kind: 'existing', path: p.coverPath }
-          : p.coverUrl ? { kind: 'url', url: p.coverUrl }
-          : null;
+      : p.coverUrl ? { kind: 'url', url: p.coverUrl }
+        : null;
     if (cover && cover.kind === 'url') $('#fCoverUrl').value = p.coverUrl;
     renderCover();
     roomList.innerHTML = '';
@@ -843,35 +1138,65 @@ function initAdmin() {
 
   function renderList() {
     const stat = $('#stat'), box = $('#projList');
+    const visible = allProjects.filter(p => p.published);
+    const hidden = allProjects.filter(p => !p.published);
     const nPhotos = allProjects.reduce((n, p) => n + totalPhotoCount(p), 0);
-    stat.textContent = `${allProjects.length} project${allProjects.length === 1 ? '' : 's'} · ${nPhotos} photo${nPhotos === 1 ? '' : 's'}`;
+    stat.textContent =
+      `${visible.length} visible · ${hidden.length} hidden · ${nPhotos} photo${nPhotos === 1 ? '' : 's'}`;
+    $('#hiddenCount').textContent = hidden.length ? String(hidden.length).padStart(2, '0') : '';
 
-    if (!allProjects.length) {
-      box.innerHTML = `<div class="empty"><svg class="ic"><use href="#i-img"/></svg><em>No projects yet</em><p>Add your first project using the form.</p></div>`;
-      return;
-    }
-
-    box.innerHTML = allProjects.map(p => {
-      const thumb = p.cover || p.rooms?.[0]?.photos?.[0]?.url || FALLBACK_IMG;
-      const nP = totalPhotoCount(p);
-      return `
+    if (!visible.length) {
+      box.innerHTML = `<div class="empty"><svg class="ic"><use href="#i-img"/></svg><em>No visible projects</em><p>Add a project, or restore one from the Hidden Projects list below.</p></div>`;
+    } else {
+      box.innerHTML = visible.map(p => {
+        const thumb = p.cover || p.rooms?.[0]?.photos?.[0]?.url || FALLBACK_IMG;
+        const nP = totalPhotoCount(p);
+        return `
         <div class="list-row">
           <img class="thumb" src="${esc(thumb)}" alt="" onerror="imgErr(this)">
           <div class="list-main">
-            <p class="list-name">${esc(p.name)}${p.published ? '' : '<span class="draft-badge">Draft</span>'}</p>
+            <p class="list-name">${esc(p.name)}</p>
             <p class="list-meta">${esc(p.location) || '—'} · ${p.rooms.length} room${p.rooms.length === 1 ? '' : 's'} · ${nP} photo${nP === 1 ? '' : 's'}</p>
           </div>
           <div class="list-actions">
-            <button class="ibtn" data-act="edit" data-id="${p.id}" aria-label="Edit project"><svg class="ic"><use href="#i-edit"/></svg></button>
-            <button class="ibtn danger" data-act="del" data-id="${p.id}" aria-label="Delete project"><svg class="ic"><use href="#i-trash"/></svg></button>
+            <button class="ibtn" data-act="edit" data-id="${p.id}" aria-label="Edit project" title="Edit"><svg class="ic"><use href="#i-edit"/></svg></button>
+            <button class="ibtn" data-act="hide" data-id="${p.id}" aria-label="Hide project" title="Hide from public site"><svg class="ic"><use href="#i-eye-off"/></svg></button>
+            <button class="ibtn danger" data-act="del" data-id="${p.id}" aria-label="Delete project" title="Delete permanently"><svg class="ic"><use href="#i-trash"/></svg></button>
           </div>
         </div>`;
-    }).join('');
+      }).join('');
+    }
 
-    $$('.ibtn', box).forEach(b => b.addEventListener('click', () => {
+    const hBox = $('#hiddenList');
+    if (!hidden.length) {
+      hBox.innerHTML = `<div class="empty empty--sm"><em>Nothing hidden</em><p>Projects you hide will be kept safely here.</p></div>`;
+    } else {
+      hBox.innerHTML = hidden.map(p => {
+        const thumb = p.cover || p.rooms?.[0]?.photos?.[0]?.url || FALLBACK_IMG;
+        return `
+        <div class="list-row">
+          <img class="thumb" src="${esc(thumb)}" alt="" onerror="imgErr(this)">
+          <div class="list-main">
+            <p class="list-name">${esc(p.name)}<span class="draft-badge">Hidden</span></p>
+            <p class="list-meta">Kept in the database · not shown on the public site</p>
+          </div>
+          <div class="list-actions">
+            <button class="ibtn" data-act="restore" data-id="${p.id}" aria-label="Restore project" title="Restore to public site"><svg class="ic"><use href="#i-eye"/></svg></button>
+            <button class="ibtn" data-act="edit" data-id="${p.id}" aria-label="Edit project" title="Edit"><svg class="ic"><use href="#i-edit"/></svg></button>
+            <button class="ibtn danger" data-act="del" data-id="${p.id}" aria-label="Delete project" title="Delete permanently"><svg class="ic"><use href="#i-trash"/></svg></button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    $$('.ibtn', box).concat($$('.ibtn', hBox)).forEach(b => b.addEventListener('click', () => {
       const id = b.dataset.id;
-      if (b.dataset.act === 'edit') startEdit(id);
-      else deleteProject(id);
+      switch (b.dataset.act) {
+        case 'edit': startEdit(id); break;
+        case 'hide': hideProject(id); break;
+        case 'restore': restoreProject(id); break;
+        case 'del': deleteProject(id); break;
+      }
     }));
   }
 
@@ -894,6 +1219,36 @@ function initAdmin() {
       }
     });
   }
+  /* ---------- Hide / Restore (no data is ever lost) ---------- */
+  function setPublished(id, published, title, messageFor, btnText, doneMsg) {
+    const p = allProjects.find(x => x.id === id);
+    openConfirm(title, messageFor(p ? p.name : 'This project'), btnText, async () => {
+      try {
+        const { error } = await sb.from('projects')
+          .update({ published, updated_at: new Date().toISOString() })
+          .eq('id', id);
+        if (error) throw error;
+        if (editingId === id) $('#fPublished').checked = published; // keep an open edit form in sync
+        toast(doneMsg);
+        await refreshList();
+      } catch (err) {
+        console.error(err);
+        toast(friendlyDbError(err));
+      }
+    });
+  }
+  const hideProject = id => setPublished(id, false,
+    'Hide project',
+    name => `“${name}” will be hidden from the public website. Nothing is deleted — photos, rooms and details are all kept, and you can restore it at any time.`,
+    'Hide', 'Project hidden');
+
+  const restoreProject = id => setPublished(id, true,
+    'Restore project',
+    name => `“${name}” will be published on the public website again.`,
+    'Restore', 'Project restored');
+
+
+
 
   /* ---------- Save (create or update) ---------- */
   form.addEventListener('submit', e => { e.preventDefault(); if (!saving) saveProject(); });
@@ -1071,7 +1426,7 @@ function initAdmin() {
       try {
         const parsed = JSON.parse(r.result);
         arr = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.projects) ? parsed.projects : null);
-      } catch (_) {}
+      } catch (_) { }
       if (!arr) { toast('Invalid backup file'); e.target.value = ''; return; }
       openConfirm('Import backup',
         `${arr.length} project(s) will be added or updated. Nothing is deleted. Photos stored by path are only valid if the files already exist in this bucket (true for backups from this same Supabase project); external URLs work anywhere.`,
@@ -1090,7 +1445,7 @@ function initAdmin() {
         const coverPath = typeof raw.coverPath === 'string' && raw.coverPath ? raw.coverPath : null;
         const legacyCover = typeof raw.cover === 'string' && raw.cover ? raw.cover : null;
         const coverUrl = (typeof raw.coverUrl === 'string' && raw.coverUrl) ? raw.coverUrl
-                       : (legacyCover && /^https?:\/\//i.test(legacyCover) ? legacyCover : null);
+          : (legacyCover && /^https?:\/\//i.test(legacyCover) ? legacyCover : null);
 
         const { error: pErr } = await sb.from('projects').upsert({
           id: pid,
@@ -1110,8 +1465,8 @@ function initAdmin() {
         const roomDefs = Array.isArray(raw.rooms) && raw.rooms.length
           ? raw.rooms.map(rm => ({ name: rm.name || rm.label || '', photos: (rm.photos || []).map(pp => ({ path: pp.path || null, url: pp.url || null })) }))
           : (Array.isArray(raw.images)
-              ? raw.images.map(im => ({ name: im.label || '', photos: [{ path: null, url: im.url || null }] }))
-              : []);
+            ? raw.images.map(im => ({ name: im.label || '', photos: [{ path: null, url: im.url || null }] }))
+            : []);
 
         let sort = 0;
         for (const rd of roomDefs) {
