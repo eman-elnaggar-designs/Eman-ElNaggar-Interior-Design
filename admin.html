@@ -1,0 +1,259 @@
+<!-- ======================= admin.html ======================= -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0c0e0c">
+  <title>Studio Admin — Eman El-Naggar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body data-page="admin">
+
+  <!-- SVG icon sprite (same as public site) -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-arrow" viewBox="0 0 24 24">
+      <path d="M3 12h17M14 6l6 6-6 6" />
+    </symbol>
+    <symbol id="i-left" viewBox="0 0 24 24">
+      <path d="M21 12H4M10 6l-6 6 6 6" />
+    </symbol>
+    <symbol id="i-up" viewBox="0 0 24 24">
+      <path d="M7 17L17 7M8 7h9v9" />
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24">
+      <path d="M5 5l14 14M19 5L5 19" />
+    </symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24">
+      <path d="M3 9h18M3 15h18" />
+    </symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24">
+      <path d="M12 5v14M5 12h14" />
+    </symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24">
+      <path d="M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z" />
+      <circle cx="12" cy="10" r="2.6" />
+    </symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24">
+      <rect x="4" y="5" width="16" height="16" rx="1.5" />
+      <path d="M4 10h16M8 3v4M16 3v4" />
+    </symbol>
+    <symbol id="i-img" viewBox="0 0 24 24">
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <circle cx="9" cy="10" r="1.8" />
+      <path d="M4 18.5l5-5 4 4 3-3 4 4" />
+    </symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24">
+      <path d="M5 4h4l2 5-2.4 1.4a12.5 12.5 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A17 17 0 0 1 3 6a2 2 0 0 1 2-2z" />
+    </symbol>
+    <symbol id="i-wa" viewBox="0 0 24 24">
+      <path d="M12 3.6a8.4 8.4 0 0 0-7.2 12.7L3.6 20.4l4.2-1.1A8.4 8.4 0 1 0 12 3.6z" />
+      <path
+        d="M9.1 8.3c-.4.9-.4 2 .4 3.2a8.4 8.4 0 0 0 3 3c1.2.7 2.3.8 3.2.4l.5-2-2.2-.8-.9.9a6.6 6.6 0 0 1-2.1-2.1l.9-.9-.8-2.2-2 .5z" />
+    </symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24">
+      <rect x="3" y="5" width="18" height="14" rx="1.5" />
+      <path d="M3 7.5l9 6 9-6" />
+    </symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24">
+      <path d="M4 20l4.5-1L20 7.5 16.5 4 5 15.5 4 20z" />
+      <path d="M13.5 7l3.5 3.5" />
+    </symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24">
+      <path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13M10 11v5.5M14 11v5.5" />
+    </symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24">
+      <rect x="9" y="9" width="12" height="12" rx="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </symbol>
+    <symbol id="i-down" viewBox="0 0 24 24">
+      <path d="M12 4v11M7 10.5l5 5 5-5M4 20h16" />
+    </symbol>
+    <symbol id="i-up2" viewBox="0 0 24 24">
+      <path d="M12 20V9M7 13.5l5-5 5 5M4 4h16" />
+    </symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24">
+      <path d="M20 12a8 8 0 1 1-2.34-5.66M20 3.5V8h-4.5" />
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="M4.5 12.5l5 5L19.5 7" />
+    </symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24">
+      <rect x="5" y="11" width="14" height="9.5" rx="1.5" />
+      <path d="M8 11V7.5a4 4 0 0 1 8 0V11M12 15v2.5" />
+    </symbol>
+  </svg>
+
+  <!-- Login gate (Supabase Authentication) -->
+  <div class="gate" id="gate">
+    <form class="gate-box" id="gateForm" novalidate>
+      <svg class="ic">
+        <use href="#i-lock" />
+      </svg>
+      <h1>Owner Access</h1>
+      <p>Sign in with the studio administrator account to manage the portfolio.</p>
+      <div class="field">
+        <label for="gateEmail">Email</label>
+        <input id="gateEmail" type="email" autocomplete="email" placeholder="you@yourstudio.com">
+      </div>
+      <div class="field">
+        <label for="gatePass">Password</label>
+        <input id="gatePass" type="password" autocomplete="current-password" placeholder="••••••••">
+      </div>
+      <button class="btn gate-btn" type="submit" id="gateBtn">Sign In <svg class="ic">
+          <use href="#i-arrow" />
+        </svg></button>
+      <p class="gate-err" id="gateErr">Incorrect email or password — please try again.</p>
+      <p class="gate-hint">The administrator account is created in your <b>Supabase dashboard</b>. Public sign-up is
+        disabled, so this is the only key to the studio.</p>
+    </form>
+  </div>
+
+  <!-- Dashboard -->
+  <div id="app" hidden>
+    <header class="admin-top">
+      <div class="top-left">
+        <a class="brand" href="index.html">Eman <i>El-Naggar</i></a>
+        <span class="admin-tag">Admin</span>
+      </div>
+      <div class="top-actions">
+        <a class="btn btn--sm btn--ghost" href="index.html">View Site</a>
+        <button class="ibtn" id="logout" aria-label="Log out" title="Log out"><svg class="ic">
+            <use href="#i-lock" />
+          </svg></button>
+      </div>
+    </header>
+
+    <main class="admin-wrap">
+      <div class="toolbar">
+        <div>
+          <h1>Project Library</h1>
+          <p class="stat" id="stat">—</p>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn--sm" id="btnNew"><svg class="ic">
+              <use href="#i-plus" />
+            </svg>New Project</button>
+          <button class="btn btn--sm btn--ghost" id="btnExport" title="Download a JSON backup (metadata only)"><svg
+              class="ic">
+              <use href="#i-down" />
+            </svg>Export</button>
+          <button class="btn btn--sm btn--ghost" id="btnImport" title="Import a JSON backup (adds/updates projects)">
+            <svg class="ic">
+              <use href="#i-up2" />
+            </svg>Import</button>
+          <input type="file" id="importFile" accept="application/json,.json" hidden>
+        </div>
+      </div>
+
+      <div class="admin-grid">
+        <!-- Form -->
+        <section class="panel form-panel" id="formPanel">
+          <h2><span id="formTitle">Add Project</span></h2>
+          <form id="projForm" novalidate>
+            <div class="field">
+              <label for="fName">Project Name *</label>
+              <input id="fName" type="text" placeholder="e.g. Luxury Villa — New Cairo">
+              <p class="err">Please enter a project name.</p>
+            </div>
+            <div class="f-row">
+              <div class="field"><label for="fLoc">Location</label><input id="fLoc" type="text" placeholder="New Cairo">
+              </div>
+              <div class="field"><label for="fYear">Year</label><input id="fYear" type="text" placeholder="2024"></div>
+            </div>
+            <div class="field">
+              <label for="fDesc">Description</label>
+              <textarea id="fDesc" placeholder="A short story about the project…"></textarea>
+            </div>
+
+            <div class="field">
+              <label>Cover Image</label>
+              <div class="cover-box" id="coverBox">
+                <img class="cover-prev" id="coverPrev" alt="Cover preview" hidden>
+                <p class="cover-empty" id="coverEmpty">No cover selected yet.</p>
+              </div>
+              <div class="cover-actions">
+                <button type="button" class="btn btn--sm" id="btnCoverPick"><svg class="ic">
+                    <use href="#i-img" />
+                  </svg>Choose Image</button>
+                <button type="button" class="btn btn--sm btn--ghost" id="btnCoverRemove" hidden><svg class="ic">
+                    <use href="#i-close" />
+                  </svg>Remove</button>
+              </div>
+              <input type="file" id="coverFile" accept="image/jpeg,image/jpg,image/png,image/webp" hidden>
+              <input id="fCoverUrl" type="url" inputmode="url"
+                placeholder="Optional: paste an external image URL instead">
+            </div>
+
+            <div class="field">
+              <label>Rooms &amp; Photos</label>
+              <p class="field-hint">Add a room, then pick photos from your gallery or computer. Use the arrows on each
+                photo to reorder. Nothing is deleted or uploaded until you press Save.</p>
+              <div id="roomList"></div>
+              <button type="button" class="btn btn--sm btn--ghost" id="btnAddRoom"><svg class="ic">
+                  <use href="#i-plus" />
+                </svg>Add Room</button>
+            </div>
+
+            <label class="check"><input type="checkbox" id="fPublished" checked><span>Published — visible on the public
+                website</span></label>
+
+            <div class="form-actions">
+              <button class="btn" type="submit" id="btnSave">Save Project</button>
+              <button class="btn btn--sm btn--ghost" type="button" id="btnCancelEdit" hidden>Cancel Edit</button>
+            </div>
+
+            <div class="save-progress" id="saveProgress" hidden>
+              <div class="bar"><span id="saveBarFill"></span></div>
+              <p id="saveStatus">Working…</p>
+            </div>
+          </form>
+        </section>
+
+        <!-- List -->
+        <section class="panel">
+          <h2><span>All Projects</span></h2>
+          <div id="projList"></div>
+        </section>
+      </div>
+
+      <p class="admin-note">Projects and photos are stored in <b>Supabase</b> (database + storage), so every change
+        syncs automatically to every device — no redeploy needed. Use <b>Export</b> occasionally for a metadata backup;
+        the image files themselves live in Supabase Storage. Uncheck <b>Published</b> to keep a project as a draft that
+        only you can see.</p>
+    </main>
+  </div>
+
+  <!-- Confirm / prompt modal -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <h3 id="mTitle"></h3>
+      <p id="mMsg"></p>
+      <div class="field" id="mField" hidden>
+        <label for="mInput">Image URL</label>
+        <input id="mInput" type="url" placeholder="https://…">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn--sm btn--ghost" id="mNo" type="button">Cancel</button>
+        <button class="btn btn--sm" id="mYes" type="button">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"><svg class="ic">
+      <use href="#i-check" />
+    </svg><span></span></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

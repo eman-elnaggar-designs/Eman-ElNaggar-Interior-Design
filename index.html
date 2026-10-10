@@ -1,0 +1,269 @@
+<!-- ======================= index.html ======================= -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0c0e0c">
+<meta name="description" content="Eman El-Naggar — Alexandria-based interior designer with over 25 years of experience creating timeless residential and commercial interiors across Egypt.">
+<title>Eman El-Naggar — Interior Designer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="public">
+
+<!-- SVG icon sprite -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M3 12h17M14 6l6 6-6 6"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="M21 12H4M10 6l-6 6 6 6"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 9h18M3 15h18"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-5.3-7-11a7 7 0 0 1 14 0c0 5.7-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="1.5"/><path d="M4 10h16M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-img" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M4 18.5l5-5 4 4 3-3 4 4"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.4 1.4a12.5 12.5 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A17 17 0 0 1 3 6a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-wa" viewBox="0 0 24 24"><path d="M12 3.6a8.4 8.4 0 0 0-7.2 12.7L3.6 20.4l4.2-1.1A8.4 8.4 0 1 0 12 3.6z"/><path d="M9.1 8.3c-.4.9-.4 2 .4 3.2a8.4 8.4 0 0 0 3 3c1.2.7 2.3.8 3.2.4l.5-2-2.2-.8-.9.9a6.6 6.6 0 0 1-2.1-2.1l.9-.9-.8-2.2-2 .5z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 7.5l9 6 9-6"/></symbol>
+  <symbol id="i-ig" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".7"/></symbol>
+  <symbol id="i-fb" viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></symbol>
+  <symbol id="i-in" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4V8h4v1.5A6 6 0 0 1 16 8z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.5 12.5l5 5L19.5 7"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9.5" rx="1.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11M12 15v2.5"/></symbol>
+</svg>
+
+<!-- Header -->
+<header class="header" id="header">
+  <a class="brand" href="#top">Eman <i>El-Naggar</i></a>
+  <nav class="nav">
+    <a href="#projects">Projects</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <button class="burger" id="burger" aria-label="Open menu"><svg class="ic"><use href="#i-menu"/></svg></button>
+</header>
+
+<!-- Fullscreen menu (mobile) -->
+<div class="menu" id="menu" aria-hidden="true">
+  <button class="icon-btn menu-close" id="menuClose" aria-label="Close menu"><svg class="ic"><use href="#i-close"/></svg></button>
+  <ul class="menu-list">
+    <li style="--d:.15s"><a href="#projects" class="menu-link"><span>01</span>Projects</a></li>
+    <li style="--d:.24s"><a href="#about" class="menu-link"><span>02</span>About</a></li>
+    <li style="--d:.33s"><a href="#contact" class="menu-link"><span>03</span>Contact</a></li>
+  </ul>
+  <p class="menu-foot">· Egypt — <a href="https://wa.me/201115462111" target="_blank" rel="noopener">WhatsApp the studio</a></p>
+</div>
+
+<main>
+  <!-- Hero -->
+  <section class="hero" id="top">
+    <div class="wrap hero-inner"> <!-- fixed: this tag was missing its closing ">" -->
+      <div class="hero-copy">
+        <p class="eyebrow rise" style="--d:.1s">Interior Designer · Egypt</p>
+        <h1 class="hero-name">
+          <span class="line"><span class="rise" style="--d:.22s">Eman</span></span>
+          <span class="line"><span class="rise it" style="--d:.36s">El-Naggar</span></span>
+        </h1>
+        <p class="hero-sub rise" style="--d:.52s">
+  Creating timeless interiors through thoughtful design, natural light, rich textures and refined details — across Egypt.
+</p>
+        <div class="hero-cta rise" style="--d:.64s">
+          <a href="#projects" class="btn">Explore Projects <svg class="ic"><use href="#i-arrow"/></svg></a>
+          <a href="#about" class="link-quiet">About the studio</a>
+        </div>
+      </div>
+      <div class="hero-media rise" style="--d:.45s">
+        <span class="frame" aria-hidden="true"></span>
+        <img src="https://picsum.photos/seed/eman-hero/1000/1250.jpg" alt="Signature interior designed by Eman El-Naggar" onerror="imgErr(this)">
+        <div class="badge" aria-hidden="true">
+          <svg viewBox="0 0 108 108">
+            <defs><path id="badge-circ" d="M54,14 a40,40 0 1,1 -0.01,0"/></defs>
+            <text><textPath href="#badge-circ">EMAN EL-NAGGAR · INTERIOR DESIGN ·</textPath></text>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <span class="scroll-cue" aria-hidden="true">Scroll</span>
+  </section>
+
+  <!-- Marquee -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <div class="marquee-group">
+        <span>Interior Design</span><i class="diamond"></i>
+        <span>Space Planning</span><i class="diamond"></i>
+        <span>Custom Furniture</span><i class="diamond"></i>
+        <span>Materials &amp; Finishes</span><i class="diamond"></i>
+        <span>Project Supervision</span><i class="diamond"></i>
+      </div>
+      <div class="marquee-group">
+        <span>Interior Design</span><i class="diamond"></i>
+        <span>Space Planning</span><i class="diamond"></i>
+        <span>Custom Furniture</span><i class="diamond"></i>
+        <span>Materials &amp; Finishes</span><i class="diamond"></i>
+        <span>Project Supervision</span><i class="diamond"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Projects -->
+  <section class="projects" id="projects">
+    <div class="wrap">
+      <header class="sec-head" data-reveal>
+        <p class="eyebrow">01 — Portfolio</p>
+        <h2 class="sec-title">Selected <em>Works</em></h2>
+        <p class="sec-note">
+  Every project is carefully designed around the space, the light, and the people who experience it. Explore each project and discover the details within every room.
+</p>
+      </header>
+      <div class="works" id="worksGrid"></div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about" id="about">
+    <div class="wrap about-grid">
+      <div class="about-media" data-reveal>
+        <span class="frame" aria-hidden="true"></span>
+        <img src="https://picsum.photos/seed/eman-portrait/1000/1250.jpg" alt="Portrait of Eman El-Naggar" loading="lazy" onerror="imgErr(this)">
+      </div>
+      <div class="about-txt" data-reveal style="transition-delay:.12s">
+        <p class="eyebrow">02 — The Designer</p>
+        <h2 class="sec-title">Designing with <em>Intention</em></h2>
+        <p>Eman El-Naggar is an Alexandria-based interior designer whose career spans more than two decades, with a practice established in 1998 and projects extending across Egypt.
+            Her approach to design is rooted in timeless elegance, thoughtful proportion, and a deep understanding of how people experience space. Rather than following trends, Eman creates interiors that balance architectural character with functionality, refined materials, and carefully considered details.</p>
+        <p>From private residences and luxury apartments to villas and bespoke interiors, every project is approached with the same attention to detail — from the initial concept and spatial planning through material selection, custom furnishings, styling, and final execution.
+
+Based in Alexandria and working across Egypt, Eman personally oversees each project to ensure that the original vision is carried through to every detail.</p>
+        <p class="about-sign">— Eman El-Naggar</p>
+        <div class="services">
+          <div class="service"><span class="service-num">01</span><div><h3>Full Interior Design</h3><p>From the first idea to the final result, we manage the complete interior design process and make sure every detail fits the space and the client's needs.</p></div></div>
+          <div class="service"><span class="service-num">02</span><div><h3>Space Planning &amp; Layout</h3><p>We create practical and beautiful layouts that make the best use of space, movement, light, and furniture.</p></div></div>
+          <div class="service"><span class="service-num">03</span><div><h3>Custom Furniture &amp; Joinery</h3><p>We design custom furniture and details that match the style, size, and character of each project.</p></div></div>
+          <div class="service"><span class="service-num">04</span><div><h3>Styling &amp; Site Supervision</h3><p>We follow the project from start to finish, working closely with the team to make sure the design is done to the right quality and standard.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <header class="sec-head" data-reveal>
+        <p class="eyebrow">03 — Contact</p>
+        <h2 class="sec-title">Let’s create a space <em>you’ll love to live in.</em></h2>
+<p class="sec-note">Eman El-Naggar — Interior Design across Egypt</p>
+
+      </header>
+      <div class="c-list" data-reveal>
+        <a class="c-row" href="tel:+201001234567">
+          <span class="c-ic"><svg class="ic"><use href="#i-phone"/></svg></span>
+          <span class="c-main"><span class="c-name">Phone</span><span class="c-val">+2 0 111 546 2111</span></span>
+          <svg class="ic"><use href="#i-up"/></svg>
+        </a>
+        <a class="c-row c-row--wa" href="https://wa.me/201115462111" target="_blank" rel="noopener">
+          <span class="c-ic"><svg class="ic"><use href="#i-wa"/></svg></span>
+          <span class="c-main"><span class="c-name">WhatsApp</span><span class="c-val">Message the studio</span></span>
+          <svg class="ic"><use href="#i-up"/></svg>
+        </a>
+        <div class="c-row">
+          <span class="c-ic"><svg class="ic"><use href="#i-mail"/></svg></span>
+          <a class="c-main" href="mailto:hello@emanelnaggar.com"><span class="c-name">Email</span><span class="c-val">hello@emanelnaggar.com</span></a>
+          <button class="c-copy" id="copyEmail" aria-label="Copy email address"><svg class="ic"><use href="#i-copy"/></svg></button>
+        </div>
+        <a class="c-row" href="https://www.instagram.com/elnagar6124?stkn=MWV6dzlkdGV3cG5ibA==" target="_blank" rel="noopener">
+          <span class="c-ic"><svg class="ic"><use href="#i-ig"/></svg></span>
+          <span class="c-main"><span class="c-name">Instagram</span><span class="c-val">@eman.elnaggar.design</span></span>
+          <svg class="ic"><use href="#i-up"/></svg>
+        </a>
+        <a class="c-row" href="https://facebook.com/eman.elnagar.376043" target="_blank" rel="noopener">
+          <span class="c-ic"><svg class="ic"><use href="#i-fb"/></svg></span>
+          <span class="c-main"><span class="c-name">Facebook</span><span class="c-val">Eman El-Naggar Design</span></span>
+          <svg class="ic"><use href="#i-up"/></svg>
+        </a>
+        <a class="c-row" href="https://www.linkedin.com/in/eman-el-naggar" target="_blank" rel="noopener">
+          <span class="c-ic"><svg class="ic"><use href="#i-in"/></svg></span>
+          <span class="c-main"><span class="c-name">LinkedIn</span><span class="c-val">Eman El-Naggar</span></span>
+          <svg class="ic"><use href="#i-up"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap foot">
+    <div>
+      <p class="foot-brand">Eman <i>El-Naggar</i></p>
+      <p class="foot-legal">Interior Design Studio — Egypt</p>
+    </div>
+    <nav class="foot-nav">
+      <a href="#projects">Projects</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="admin.html">◈</a>
+    </nav>
+    <p class="foot-legal">© <span id="year"></span> Eman El-Naggar. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- Floating WhatsApp -->
+<a class="float" href="https://wa.me/201115462111" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <svg class="ic"><use href="#i-wa"/></svg>
+</a>
+
+<!-- Project detail overlay -->
+<div class="detail" id="detail" role="dialog" aria-modal="true" aria-label="Project details">
+  <div class="detail-bar">
+    <span class="detail-idx" id="dIdx">01 / 05</span>
+    <button class="icon-btn" id="dClose" aria-label="Close project"><svg class="ic"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="detail-hero" id="dHero">
+    <img id="dHeroImg" src="" alt="">
+    <span class="detail-chip" id="dChip"><svg class="ic" style="width:14px;height:14px"><use href="#i-img"/></svg> View Gallery</span>
+  </div>
+  <div class="detail-body wrap">
+    <p class="eyebrow">Project</p>
+    <h2 class="detail-title" id="dName"></h2>
+    <div class="detail-meta">
+      <span class="meta-item"><svg class="ic"><use href="#i-pin"/></svg><span id="dLoc"></span></span>
+      <span class="meta-item"><svg class="ic"><use href="#i-cal"/></svg><span id="dYear"></span></span>
+      <span class="meta-item"><svg class="ic"><use href="#i-img"/></svg><span id="dCount"></span></span>
+    </div>
+    <p class="detail-desc" id="dDesc"></p>
+    <div class="rooms">
+      <p class="eyebrow rooms-head">Rooms &amp; Spaces</p>
+      <div id="dRooms"></div>
+    </div>
+    <button class="next-proj" id="dNext">
+      <span><span class="eyebrow">Next Project</span><span class="next-name" id="dNextName"></span></span>
+      <svg class="ic"><use href="#i-arrow"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image gallery">
+  <div class="lb-top">
+    <span class="lb-count" id="lbCount">01 / 04</span>
+    <button class="icon-btn" id="lbClose" aria-label="Close gallery"><svg class="ic"><use href="#i-close"/></svg></button>
+  </div>
+  <div class="lb-stage" id="lbStage">
+    <button class="lb-btn lb-prev" id="lbPrev" aria-label="Previous image"><svg class="ic"><use href="#i-left"/></svg></button>
+    <img class="lb-img" id="lbImg" src="" alt="Project image">
+    <button class="lb-btn lb-next" id="lbNext" aria-label="Next image"><svg class="ic"><use href="#i-arrow"/></svg></button>
+  </div>
+  <p class="lb-cap" id="lbCap"></p>
+</div>
+
+<div class="toast" id="toast"><svg class="ic"><use href="#i-check"/></svg><span></span></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
